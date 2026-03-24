@@ -1,0 +1,62 @@
+version: '3.9'
+
+services:
+
+  auth-service:
+    build: ./auth-service
+    container_name: quickbite-auth
+    ports:
+      - "3001:3001"
+    environment:
+      PORT: 3001
+      JWT_SECRET: quickbite_super_secret_2024
+    networks:
+      - quickbite-net
+    restart: unless-stopped
+
+  products-service:
+    build: ./products-service
+    container_name: quickbite-products
+    ports:
+      - "3002:3002"
+    environment:
+      PORT: 3002
+      JWT_SECRET: quickbite_super_secret_2024
+    networks:
+      - quickbite-net
+    restart: unless-stopped
+
+  orders-service:
+    build: ./orders-service
+    container_name: quickbite-orders
+    ports:
+      - "3003:3003"
+    environment:
+      PORT: 3003
+      JWT_SECRET: quickbite_super_secret_2024
+      PRODUCTS_SERVICE_URL: http://products-service:3002
+      PAYMENTS_SERVICE_URL: http://payments-service:3004
+    networks:
+      - quickbite-net
+    restart: unless-stopped
+    depends_on:
+      - products-service
+
+  payments-service:
+    build: ./payments-service
+    container_name: quickbite-payments
+    ports:
+      - "3004:3004"
+    environment:
+      PORT: 3004
+      JWT_SECRET: quickbite_super_secret_2024
+      ORDERS_SERVICE_URL: http://orders-service:3003
+    networks:
+      - quickbite-net
+    restart: unless-stopped
+    depends_on:
+      - orders-service
+
+networks:
+  quickbite-net:
+    driver: bridge
