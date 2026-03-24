@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QuickBite — Sistema de Gestión de Pedidos</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="CSS/index.css">
+
+</head>
+<body>
+
+<!-- ═══════════════ NAV ═══════════════ -->
+<div id="nav-global" style="display:none">
+  <nav>
+    <div class="nav-logo">Quick<span>Bite</span></div>
+    <button class="nav-btn" onclick="goTo('menu')">Menú</button>
+    <button class="nav-btn" onclick="goTo('orders')">Mis Pedidos</button>
+    <button class="nav-btn" id="admin-link" onclick="goTo('admin')" style="display:none">Admin</button>
+    <button class="nav-btn" onclick="toggleCart()" id="cart-nav-btn">
+      🛒 Carrito <span class="cart-badge" id="cart-count">0</span>
+    </button>
+    <button class="nav-btn primary" onclick="logout()">Salir</button>
+  </nav>
+</div>
+
+<!-- ═══════════════ VIEW: AUTH ═══════════════ -->
+<div class="view active" id="view-auth">
+  <nav>
+    <div class="nav-logo">Quick<span>Bite</span></div>
+  </nav>
+  <div class="auth-wrap">
+    <div class="auth-box">
+      <h2 id="auth-title">Iniciar sesión</h2>
+      <p id="auth-sub">Bienvenido de nuevo. Ingresa tus credenciales.</p>
+
+      <div id="register-only" style="display:none">
+        <div class="form-group">
+          <label class="form-label">Nombre completo</label>
+          <input class="form-input" type="text" placeholder="Ej. Juan Pérez">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Rol</label>
+          <select class="form-select" id="role-select">
+            <option value="cliente">Cliente</option>
+            <option value="admin">Administrador</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Correo electrónico</label>
+        <input class="form-input" type="email" id="email-input" placeholder="correo@ejemplo.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Contraseña</label>
+        <input class="form-input" type="password" id="pass-input" placeholder="••••••••">
+      </div>
+
+      <button class="submit-btn" onclick="handleAuth()">Entrar</button>
+      <div class="auth-switch" id="auth-switch-text">
+        ¿No tienes cuenta? <a onclick="toggleAuthMode()">Regístrate</a>
+      </div>
+
+      <div id="jwt-preview" style="display:none">
+        <div class="jwt-label">Token JWT generado:</div>
+        <div class="jwt-box" id="jwt-token-display"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ VIEW: MENU ═══════════════ -->
+<div class="view" id="view-menu">
+  <div class="hero">
+    <h1>Pide lo que<br>te <em>antoje</em> hoy</h1>
+    <p>Comida rápida, sabor de verdad. Elige tu favorito y lo tendrás listo en minutos.</p>
+  </div>
+
+  <div class="cats" id="cat-list"></div>
+  <div class="products" id="product-list"></div>
+</div>
+
+<!-- ═══════════════ VIEW: ORDERS ═══════════════ -->
+<div class="view" id="view-orders">
+  <div class="orders-container">
+    <h2>Mis pedidos</h2>
+    <div id="orders-list"></div>
+  </div>
+</div>
+
+<!-- ═══════════════ VIEW: ADMIN ═══════════════ -->
+<div class="view" id="view-admin">
+  <div class="admin-layout">
+    <aside class="sidebar">
+      <div class="sidebar-label">Panel</div>
+      <div class="sidebar-item active" onclick="adminTab('products')" id="tab-products">
+        <span class="sidebar-icon">📦</span> Productos
+      </div>
+      <div class="sidebar-item" onclick="adminTab('orders')" id="tab-orders">
+        <span class="sidebar-icon">🧾</span> Pedidos
+      </div>
+      <div class="sidebar-label">Sistema</div>
+      <div class="sidebar-item" onclick="adminTab('stats')" id="tab-stats">
+        <span class="sidebar-icon">📊</span> Estadísticas
+      </div>
+    </aside>
+
+    <main class="admin-main">
+      <!-- STATS -->
+      <div id="admin-stats" style="display:none">
+        <h2>Estadísticas</h2>
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-label">Pedidos hoy</div><div class="stat-val orange">24</div></div>
+          <div class="stat-card"><div class="stat-label">Ingresos hoy</div><div class="stat-val green">$1,840</div></div>
+          <div class="stat-card"><div class="stat-label">En proceso</div><div class="stat-val blue">6</div></div>
+          <div class="stat-card"><div class="stat-label">Pendientes</div><div class="stat-val amber">3</div></div>
+        </div>
+        <div class="table-wrap"><div style="padding:60px;text-align:center;color:var(--muted)">📈 Gráficos de ventas aquí (Chart.js)</div></div>
+      </div>
+
+      <!-- PRODUCTSS ADMIN -->
+      <div id="admin-products">
+        <h2>Gestión de Productos</h2>
+        <div class="table-wrap">
+          <div class="table-header">
+            <h3>Todos los productos</h3>
+            <button class="add-product-btn" onclick="showToast('Formulario para agregar producto')">+ Agregar producto</button>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Producto</th><th>Categoría</th><th>Precio</th><th>Disponible</th><th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="admin-product-table"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ORDEnes ADMIN -->
+      <div id="admin-orders" style="display:none">
+        <h2>Gestión de Pedidos</h2>
+        <div class="admin-orders-table">
+          <table>
+            <thead>
+              <tr><th>Pedido</th><th>Cliente</th><th>Items</th><th>Total</th><th>Estado</th><th>Acción</th></tr>
+            </thead>
+            <tbody id="admin-orders-table"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ═══════════════ Carrito PANEL ═══════════════ -->
+<div class="cart-panel" id="cart-panel">
+  <div class="cart-header">
+    <h2>Tu carrito</h2>
+    <button class="close-btn" onclick="toggleCart()">✕</button>
+  </div>
+  <div class="cart-items" id="cart-items">
+    <div class="empty-cart"><span>🛒</span><p>Tu carrito está vacío</p></div>
+  </div>
+  <div class="cart-footer" id="cart-footer" style="display:none">
+    <div class="cart-total">
+      <span>Total</span>
+      <strong id="cart-total">$0.00</strong>
+    </div>
+    <button class="checkout-btn" onclick="checkout()">Confirmar pedido →</button>
+  </div>
+</div>
+
+<!-- ═══════════════ pago MODAL ═══════════════ -->
+<div class="modal-bg" id="pay-modal">
+  <div class="modal">
+    <h3>💳 Método de pago</h3>
+    <div class="method-grid">
+      <div class="method-card selected" onclick="selectMethod(this)">
+        <span>💵</span><p>Efectivo</p>
+      </div>
+      <div class="method-card" onclick="selectMethod(this)">
+        <span>💳</span><p>Tarjeta</p>
+      </div>
+      <div class="method-card" onclick="selectMethod(this)">
+        <span>📱</span><p>Transferencia</p>
+      </div>
+      <div class="method-card" onclick="selectMethod(this)">
+        <span>🔗</span><p>Crypto</p>
+      </div>
+    </div>
+    <button class="confirm-pay-btn" onclick="confirmPayment()">Confirmar pago</button>
+    <button class="cancel-pay-btn" onclick="closeModal()">Cancelar</button>
+  </div>
+</div>
+
+<!-- ═══════════════ TOAST ═══════════════ -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DATA ──
+const PRODUCTS = [
+  { id:1, name:'Classic Burger', emoji:'🍔', cat:'Hamburguesas', price:8.99, desc:'Res angus, lechuga, tomate y queso cheddar', avail:true },
+  { id:2, name:'BBQ Doble', emoji:'🍔', cat:'Hamburguesas', price:11.99, desc:'Doble carne, tocino crujiente, salsa BBQ', avail:true },
+  { id:3, name:'Crispy Chicken', emoji:'🍗', cat:'Pollo', price:9.50, desc:'Pechuga empanizada, coleslaw y pepinillos', avail:true },
+  { id:4, name:'Hot Wings x6', emoji:'🍗', cat:'Pollo', price:7.50, desc:'Alitas picantes con dip de queso azul', avail:true },
+  { id:5, name:'Pizza Margherita', emoji:'🍕', cat:'Pizzas', price:12.00, desc:'Tomate, mozzarella fresca y albahaca', avail:true },
+  { id:6, name:'Pepperoni Love', emoji:'🍕', cat:'Pizzas', price:13.50, desc:'Doble pepperoni, queso manchego', avail:false },
+  { id:7, name:'Papas Fritas L', emoji:'🍟', cat:'Acompañantes', price:3.99, desc:'Crujientes, con sal marina y especias', avail:true },
+  { id:8, name:'Tacos x3', emoji:'🌮', cat:'Mexicana', price:8.00, desc:'Carne asada, guacamole y pico de gallo', avail:true },
+  { id:9, name:'Sundae de Vainilla', emoji:'🍦', cat:'Postres', price:4.50, desc:'Helado suave con caramelo y nueces', avail:true },
+  { id:10, name:'Refresco Grande', emoji:'🥤', cat:'Bebidas', price:2.50, desc:'Elige tu sabor favorito, con hielo', avail:true },
+];
+
+const SAMPLE_ORDERS = [
+  { id:'#ORD-001', date:'Hoy 12:34', items:['Classic Burger x1','Papas Fritas L x1'], total:12.98, status:'delivered', client:'Ana García' },
+  { id:'#ORD-002', date:'Hoy 13:10', items:['Hot Wings x6 x2','Refresco Grande x2'], total:20.00, status:'process', client:'Carlos López' },
+  { id:'#ORD-003', date:'Hoy 13:45', items:['Pizza Margherita x1','Sundae de Vainilla x2'], total:21.00, status:'pending', client:'María Torres' },
+  { id:'#ORD-004', date:'Hoy 14:02', items:['BBQ Doble x2','Papas Fritas L x2'], total:31.96, status:'pending', client:'Luis Rodríguez' },
+];
+
+let cart = [];
+let currentUser = null;
+let isLogin = true;
+let activeCategory = 'Todos';
+
+// ── AUTH ──
+function handleAuth() {
+  const email = document.getElementById('email-input').value || 'usuario@demo.com';
+  const role = isLogin ? (email.includes('admin') ? 'admin' : 'cliente')
+    : document.getElementById('role-select').value;
+  currentUser = { email, role, name: email.split('@')[0] };
+  const fakeJWT = 'eyJhbGciOiJIUzI1NiJ9.' + btoa(JSON.stringify({sub:email,role,exp:9999999999})) + '.SIG_DEMO';
+  document.getElementById('jwt-token-display').textContent = fakeJWT;
+  document.getElementById('jwt-preview').style.display = 'block';
+  setTimeout(() => {
+    document.getElementById('nav-global').style.display = 'block';
+    if (role === 'admin') document.getElementById('admin-link').style.display = '';
+    goTo(role === 'admin' ? 'admin' : 'menu');
+    showToast(`¡Bienvenido, ${currentUser.name}! Rol: ${role}`);
+  }, 900);
+}
+
+function toggleAuthMode() {
+  isLogin = !isLogin;
+  document.getElementById('auth-title').textContent = isLogin ? 'Iniciar sesión' : 'Crear cuenta';
+  document.getElementById('auth-sub').textContent = isLogin
+    ? 'Bienvenido de nuevo. Ingresa tus credenciales.'
+    : 'Completa los datos para registrarte.';
+  document.getElementById('register-only').style.display = isLogin ? 'none' : 'block';
+  document.getElementById('auth-switch-text').innerHTML = isLogin
+    ? '¿No tienes cuenta? <a onclick="toggleAuthMode()">Regístrate</a>'
+    : '¿Ya tienes cuenta? <a onclick="toggleAuthMode()">Inicia sesión</a>';
+  document.getElementById('jwt-preview').style.display = 'none';
+}
+
+function logout() {
+  currentUser = null; cart = [];
+  document.getElementById('nav-global').style.display = 'none';
+  document.getElementById('jwt-preview').style.display = 'none';
+  updateCartBadge();
+  goTo('auth');
+}
+
+// ── Navegación ──
+function goTo(view) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + view).classList.add('active');
+  if (view === 'menu') renderMenu();
+  if (view === 'orders') renderOrders();
+  if (view === 'admin') { renderAdminProducts(); renderAdminOrders(); }
+}
+
+// ── MENU ──
+function renderMenu() {
+  const cats = ['Todos', ...new Set(PRODUCTS.map(p => p.cat))];
+  const catList = document.getElementById('cat-list');
+  catList.innerHTML = cats.map(c =>
+    `<div class="cat-pill ${c===activeCategory?'active':''}" onclick="filterCat('${c}')">${c}</div>`
+  ).join('');
+
+  const filtered = activeCategory === 'Todos' ? PRODUCTS : PRODUCTS.filter(p => p.cat === activeCategory);
+  document.getElementById('product-list').innerHTML = filtered.map((p,i) => `
+    <div class="product-card ${p.avail?'':'unavailable'}" style="animation-delay:${i*40}ms">
+      <div class="product-img">${p.emoji}</div>
+      <div class="product-info">
+        <div class="product-cat">${p.cat}</div>
+        <div class="product-name">${p.name}</div>
+        <div class="product-desc">${p.desc}</div>
+        <div class="product-footer">
+          <div class="product-price">$${p.price.toFixed(2)}</div>
+          ${p.avail
+            ? `<button class="add-btn" onclick="addToCart(${p.id})">+</button>`
+            : `<span class="unavail-badge">No disponible</span>`}
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function filterCat(cat) { activeCategory = cat; renderMenu(); }
+
+// ── Carrito ──
+function addToCart(id) {
+  const p = PRODUCTS.find(x => x.id === id);
+  const existing = cart.find(x => x.id === id);
+  if (existing) existing.qty++;
+  else cart.push({ ...p, qty: 1 });
+  updateCartBadge();
+  showToast(`${p.emoji} ${p.name} agregado`);
+}
+
+function updateCartBadge() {
+  const total = cart.reduce((s,i) => s + i.qty, 0);
+  document.getElementById('cart-count').textContent = total;
+}
+
+function toggleCart() {
+  document.getElementById('cart-panel').classList.toggle('open');
+  renderCart();
+}
+
+function renderCart() {
+  const el = document.getElementById('cart-items');
+  const footer = document.getElementById('cart-footer');
+  if (!cart.length) {
+    el.innerHTML = '<div class="empty-cart"><span>🛒</span><p>Tu carrito está vacío</p></div>';
+    footer.style.display = 'none'; return;
+  }
+  el.innerHTML = cart.map(item => `
+    <div class="cart-item">
+      <div class="cart-item-emoji">${item.emoji}</div>
+      <div class="cart-item-info">
+        <div class="cart-item-name">${item.name}</div>
+        <div class="cart-item-price">$${(item.price * item.qty).toFixed(2)}</div>
+      </div>
+      <div class="qty-ctrl">
+        <button class="qty-btn" onclick="changeQty(${item.id},-1)">−</button>
+        <span class="qty-num">${item.qty}</span>
+        <button class="qty-btn" onclick="changeQty(${item.id},1)">+</button>
+      </div>
+    </div>`).join('');
+  const total = cart.reduce((s,i) => s + i.price * i.qty, 0);
+  document.getElementById('cart-total').textContent = '$' + total.toFixed(2);
+  footer.style.display = 'block';
+}
+
+function changeQty(id, delta) {
+  const item = cart.find(x => x.id === id);
+  if (!item) return;
+  item.qty += delta;
+  if (item.qty <= 0) cart = cart.filter(x => x.id !== id);
+  updateCartBadge();
+  renderCart();
+}
+
+function checkout() {
+  if (!cart.length) return;
+  document.getElementById('pay-modal').classList.add('open');
+}
+
+function selectMethod(el) {
+  document.querySelectorAll('.method-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function confirmPayment() {
+  const newOrder = {
+    id: '#ORD-00' + (SAMPLE_ORDERS.length + 1),
+    date: 'Ahora mismo',
+    items: cart.map(i => `${i.name} x${i.qty}`),
+    total: cart.reduce((s,i) => s + i.price*i.qty, 0),
+    status: 'pending',
+    client: currentUser?.name || 'Cliente'
+  };
+  SAMPLE_ORDERS.unshift(newOrder);
+  cart = []; updateCartBadge();
+  closeModal();
+  document.getElementById('cart-panel').classList.remove('open');
+  showToast('✅ Pedido confirmado y pago registrado');
+  setTimeout(() => goTo('orders'), 600);
+}
+
+function closeModal() { document.getElementById('pay-modal').classList.remove('open'); }
+
+// ── Ordenes ──
+function renderOrders() {
+  const el = document.getElementById('orders-list');
+  const userOrders = currentUser?.role === 'admin' ? SAMPLE_ORDERS
+    : SAMPLE_ORDERS.filter(o => o.client === (currentUser?.name || '') || true).slice(0,4);
+  const statusMap = { pending:'Pendiente', process:'En proceso', delivered:'Entregado' };
+  const statusClass = { pending:'status-pending', process:'status-process', delivered:'status-delivered' };
+  el.innerHTML = userOrders.map(o => `
+    <div class="order-card">
+      <div class="order-header">
+        <div>
+          <div class="order-id">${o.id}</div>
+          <div class="order-date">${o.date}</div>
+        </div>
+        <span class="status-badge ${statusClass[o.status]}">${statusMap[o.status]}</span>
+      </div>
+      <div class="order-items">${o.items.join(' · ')}</div>
+      <div class="order-footer">
+        <div>
+          <div class="order-total-label">Total del pedido</div>
+          <div class="order-total-val">$${o.total.toFixed(2)}</div>
+        </div>
+        ${o.status === 'pending'
+          ? `<button class="pay-btn" onclick="showToast('Procesando pago...')">Pagar ahora</button>`
+          : `<span style="font-size:13px;color:var(--muted)">Cliente: ${o.client}</span>`}
+      </div>
+    </div>`).join('');
+}
+
+// ── Panel administrador ──
+function adminTab(tab) {
+  ['products','orders','stats'].forEach(t => {
+    document.getElementById('admin-'+t).style.display = t===tab ? 'block' : 'none';
+    document.getElementById('tab-'+t)?.classList.toggle('active', t===tab);
+  });
+}
+
+function renderAdminProducts() {
+  const tbody = document.getElementById('admin-product-table');
+  tbody.innerHTML = PRODUCTS.map(p => `
+    <tr>
+      <td>${p.emoji} ${p.name}</td>
+      <td style="color:var(--muted2)">${p.cat}</td>
+      <td style="color:var(--accent);font-weight:600">$${p.price.toFixed(2)}</td>
+      <td>
+        <span class="avail-dot ${p.avail?'dot-on':'dot-off'}"></span>
+        ${p.avail?'Sí':'No'}
+      </td>
+      <td>
+        <button class="action-btn" onclick="showToast('Editar ${p.name}')">Editar</button>
+        <button class="action-btn danger" onclick="showToast('Eliminar ${p.name}')">Eliminar</button>
+      </td>
+    </tr>`).join('');
+}
+
+function renderAdminOrders() {
+  const statusMap = { pending:'Pendiente', process:'En proceso', delivered:'Entregado' };
+  const statusClass = { pending:'status-pending', process:'status-process', delivered:'status-delivered' };
+  const next = { pending:'process', process:'delivered', delivered:'delivered' };
+  const nextLabel = { pending:'→ En proceso', process:'→ Entregado', delivered:'✓ Listo' };
+  document.getElementById('admin-orders-table').innerHTML = SAMPLE_ORDERS.map(o => `
+    <tr>
+      <td style="font-weight:600">${o.id}</td>
+      <td style="color:var(--muted2)">${o.client}</td>
+      <td style="color:var(--muted2);font-size:12px">${o.items.join(', ')}</td>
+      <td style="color:var(--accent);font-weight:600">$${o.total.toFixed(2)}</td>
+      <td><span class="status-badge ${statusClass[o.status]}">${statusMap[o.status]}</span></td>
+      <td>
+        ${o.status !== 'delivered'
+          ? `<button class="action-btn" onclick="advanceOrder('${o.id}')">${nextLabel[o.status]}</button>`
+          : '<span style="color:var(--muted);font-size:12px">Completado</span>'}
+      </td>
+    </tr>`).join('');
+}
+
+function advanceOrder(id) {
+  const next = { pending:'process', process:'delivered' };
+  const o = SAMPLE_ORDERS.find(x => x.id === id);
+  if (o && next[o.status]) { o.status = next[o.status]; renderAdminOrders(); showToast(`Pedido ${id} actualizado`); }
+}
+
+// ── TOAST ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>
