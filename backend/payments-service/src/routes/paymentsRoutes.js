@@ -1,13 +1,13 @@
-const express = require('express');
-const router  = express.Router();
+import { Router } from 'express';
+const router  = Router();
 
-const { register, getByOrder, getAll, updateStatus } = require('../controllers/paymentsController');
-const { verifyToken, requireAdmin }                  = require('../middlewares/verifyToken');
+import { register, getByOrder, getAll, updateStatus } from '../controllers/paymentsController.js';
+import { verifyToken, requireAdmin } from '../middlewares/verifyToken.js';
 
 // Todas las rutas requieren autenticación
-router.post('/',                    verifyToken,               register);
-router.get('/',                     verifyToken,               getAll);
-router.get('/order/:orderId',       verifyToken,               getByOrder);
-router.patch('/:id/status',         verifyToken, requireAdmin, updateStatus);
+router.post('/',verifyToken,register);
+router.get('/',verifyToken,getAll);
+router.get('/order/:orderId',verifyToken,getByOrder);
+router.patch('/:id/status', verifyToken, requireAdmin, updateStatus);
 
-module.exports = router;
+export default router;
