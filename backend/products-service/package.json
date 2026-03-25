@@ -1,6 +1,7 @@
 {
   "name": "quickbite-products-service",
   "version": "1.0.0",
+  "type": "module",
   "description": "QuickBite — Servicio de productos y menú",
   "main": "src/index.js",
   "scripts": {
@@ -11,7 +12,8 @@
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.2",
     "cors": "^2.8.5",
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.3.1",
+    "pg": "^8.13.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.2"

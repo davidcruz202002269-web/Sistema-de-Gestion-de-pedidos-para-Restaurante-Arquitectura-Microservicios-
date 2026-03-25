@@ -1,0 +1,267 @@
+{
+  "info": {
+    "name": "QuickBite API",
+    "description": "Coleccion completa de la API de QuickBite - Sistema de Gestion de Pedidos para Restaurante",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "token", "value": "" },
+    { "key": "adminToken", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Health Checks",
+      "item": [
+        {
+          "name": "Gateway Health",
+          "request": { "method": "GET", "url": "{{baseUrl}}/health" }
+        }
+      ]
+    },
+    {
+      "name": "Auth Service",
+      "item": [
+        {
+          "name": "Register Cliente",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/auth/register",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Cliente\",\n  \"email\": \"test@quickbite.com\",\n  \"password\": \"test123\",\n  \"role\": \"cliente\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var data = pm.response.json();",
+                  "if (data.token) pm.collectionVariables.set('token', data.token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login Admin",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@quickbite.com\",\n  \"password\": \"admin123\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var data = pm.response.json();",
+                  "if (data.token) {",
+                  "  pm.collectionVariables.set('adminToken', data.token);",
+                  "  pm.collectionVariables.set('token', data.token);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login Cliente",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"cliente@quickbite.com\",\n  \"password\": \"cliente123\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var data = pm.response.json();",
+                  "if (data.token) pm.collectionVariables.set('token', data.token);"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Products Service",
+      "item": [
+        {
+          "name": "Get All Products",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/products" }
+        },
+        {
+          "name": "Get Products by Category",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/products?category=Pizzas" }
+        },
+        {
+          "name": "Get Product by ID",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/products/1" }
+        },
+        {
+          "name": "Create Product (Admin)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/products",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Nuevo Producto\",\n  \"emoji\": \"🧁\",\n  \"category\": \"Postres\",\n  \"price\": 5.99,\n  \"description\": \"Producto de prueba\",\n  \"available\": true\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Product (Admin)",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/api/products/1",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"price\": 9.99,\n  \"available\": true\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Product (Admin)",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/products/11",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Orders Service",
+      "item": [
+        {
+          "name": "Create Order",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/orders",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    { \"productId\": 1, \"name\": \"Classic Burger\", \"qty\": 2, \"price\": 8.99 },\n    { \"productId\": 7, \"name\": \"Papas Fritas L\", \"qty\": 1, \"price\": 3.99 }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Get All Orders",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/orders",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        },
+        {
+          "name": "Get Order by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/orders/ORD-001",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        },
+        {
+          "name": "Update Order Status (Admin)",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/api/orders/ORD-001/status",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"process\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payments Service",
+      "item": [
+        {
+          "name": "Register Payment",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/payments",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": \"ORD-005\",\n  \"amount\": 21.97,\n  \"method\": \"tarjeta\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get All Payments",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/payments",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        },
+        {
+          "name": "Get Payment by Order",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/payments/order/ORD-005",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ]
+          }
+        },
+        {
+          "name": "Update Payment Status (Admin)",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/api/payments/PAY-001/status",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"paid\"\n}"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

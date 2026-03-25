@@ -1,16 +1,14 @@
 import { Router } from 'express';
-const router  = Router();
+import productsController from '../controllers/productsController.js';
+import auth from '../middlewares/verifyToken.js';
 
-import { getAll, getById, create, update, remove } from '../controllers/productsController.js';
-import { verifyToken, requireAdmin } from '../middlewares/verifyToken.js';
+const router = Router();
 
-// Rutas públicas (solo lectura)
-router.get('/',    getAll);
-router.get('/:id', getById);
+router.get('/', productsController.getAll);
+router.get('/:id', productsController.getById);
 
-// Rutas protegidas — solo admin puede modificar
-router.post('/',    verifyToken, requireAdmin, create);
-router.put('/:id',  verifyToken, requireAdmin, update);
-router.delete('/:id', verifyToken, requireAdmin, remove);
+router.post('/', auth.verifyToken, auth.requireAdmin, productsController.create);
+router.put('/:id', auth.verifyToken, auth.requireAdmin, productsController.update);
+router.delete('/:id', auth.verifyToken, auth.requireAdmin, productsController.remove);
 
 export default router;

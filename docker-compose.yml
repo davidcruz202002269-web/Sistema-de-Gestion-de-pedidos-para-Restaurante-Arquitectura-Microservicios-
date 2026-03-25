@@ -1,0 +1,117 @@
+services:
+
+  postgres:
+    build: ./backend/database
+    container_name: quickbite-postgres
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_USER: quickbite
+      POSTGRES_PASSWORD: quickbite123
+      POSTGRES_DB: quickbite
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    networks:
+      - quickbite-net
+    restart: unless-stopped
+
+  api-gateway:
+    build: ./backend/api-gateway
+    container_name: quickbite-gateway
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      AUTH_SERVICE_URL: http://auth-service:3001
+      PRODUCTS_SERVICE_URL: http://products-service:3002
+      ORDERS_SERVICE_URL: http://orders-service:3003
+      PAYMENTS_SERVICE_URL: http://payments-service:3004
+    depends_on:
+      - auth-service
+      - products-service
+      - orders-service
+      - payments-service
+    networks:
+      - quickbite-net
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: quickbite-frontend
+    ports:
+      - "8080:80"
+    networks:
+      - quickbite-net
+    restart: unless-stopped
+
+  auth-service:
+    build: ./backend/auth-service
+    container_name: quickbite-auth
+    ports:
+      - "3001:3001"
+    environment:
+      PORT: 3001
+      JWT_SECRET: quickbite_super_secret_2024
+      DATABASE_URL: postgresql://quickbite:quickbite123@postgres:5432/quickbite
+    depends_on:
+      - postgres
+    networks:
+      - quickbite-net
+    restart: unless-stopped
+
+  products-service:
+    build: ./backend/products-service
+    container_name: quickbite-products
+    ports:
+      - "3002:3002"
+    environment:
+      PORT: 3002
+      JWT_SECRET: quickbite_super_secret_2024
+      DATABASE_URL: postgresql://quickbite:quickbite123@postgres:5432/quickbite
+    depends_on:
+      - postgres
+    networks:
+      - quickbite-net
+    restart: unless-stopped
+
+  orders-service:
+    build: ./backend/orders-service
+    container_name: quickbite-orders
+    ports:
+      - "3003:3003"
+    environment:
+      PORT: 3003
+      JWT_SECRET: quickbite_super_secret_2024
+      DATABASE_URL: postgresql://quickbite:quickbite123@postgres:5432/quickbite
+      PRODUCTS_SERVICE_URL: http://products-service:3002
+      PAYMENTS_SERVICE_URL: http://payments-service:3004
+    depends_on:
+      - postgres
+      - products-service
+    networks:
+      - quickbite-net
+    restart: unless-stopped
+
+  payments-service:
+    build: ./backend/payments-service
+    container_name: quickbite-payments
+    ports:
+      - "3004:3004"
+    environment:
+      PORT: 3004
+      JWT_SECRET: quickbite_super_secret_2024
+      DATABASE_URL: postgresql://quickbite:quickbite123@postgres:5432/quickbite
+      ORDERS_SERVICE_URL: http://orders-service:3003
+    depends_on:
+      - postgres
+      - orders-service
+    networks:
+      - quickbite-net
+    restart: unless-stopped
+
+volumes:
+  pg-data:
+
+networks:
+  quickbite-net:
+    driver: bridge

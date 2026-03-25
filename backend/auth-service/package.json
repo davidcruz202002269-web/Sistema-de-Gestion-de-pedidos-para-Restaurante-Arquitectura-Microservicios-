@@ -1,8 +1,8 @@
 {
-  "name": "quickbite-payments-service",
+  "name": "quickbite-auth-service",
   "version": "1.0.0",
   "type": "module",
-  "description": "QuickBite — Servicio de pagos",
+  "description": "QuickBite — Servicio de autenticación JWT",
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
@@ -13,7 +13,8 @@
     "jsonwebtoken": "^9.0.2",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
-    "pg": "^8.13.0"
+    "pg": "^8.13.0",
+    "bcryptjs": "^2.4.3"
   },
   "devDependencies": {
     "nodemon": "^3.0.2"

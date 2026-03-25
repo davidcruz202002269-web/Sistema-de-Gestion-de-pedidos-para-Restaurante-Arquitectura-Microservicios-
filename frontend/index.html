@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>QuickBite — Sistema de Gestión de Pedidos</title>
+<title>QuickBite — Sistema de Gestion de Pedidos</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="CSS/index.css">
@@ -11,11 +11,11 @@
 </head>
 <body>
 
-<!-- ═══════════════ NAV ═══════════════ -->
+<!-- NAV -->
 <div id="nav-global" style="display:none">
   <nav>
     <div class="nav-logo">Quick<span>Bite</span></div>
-    <button class="nav-btn" onclick="goTo('menu')">Menú</button>
+    <button class="nav-btn" onclick="goTo('menu')">Menu</button>
     <button class="nav-btn" onclick="goTo('orders')">Mis Pedidos</button>
     <button class="nav-btn" id="admin-link" onclick="goTo('admin')" style="display:none">Admin</button>
     <button class="nav-btn" onclick="toggleCart()" id="cart-nav-btn">
@@ -25,20 +25,20 @@
   </nav>
 </div>
 
-<!-- ═══════════════ VIEW: AUTH ═══════════════ -->
+<!-- VIEW: AUTH -->
 <div class="view active" id="view-auth">
   <nav>
     <div class="nav-logo">Quick<span>Bite</span></div>
   </nav>
   <div class="auth-wrap">
     <div class="auth-box">
-      <h2 id="auth-title">Iniciar sesión</h2>
+      <h2 id="auth-title">Iniciar sesion</h2>
       <p id="auth-sub">Bienvenido de nuevo. Ingresa tus credenciales.</p>
 
       <div id="register-only" style="display:none">
         <div class="form-group">
           <label class="form-label">Nombre completo</label>
-          <input class="form-input" type="text" placeholder="Ej. Juan Pérez">
+          <input class="form-input" type="text" id="name-input" placeholder="Ej. Juan Perez">
         </div>
         <div class="form-group">
           <label class="form-label">Rol</label>
@@ -50,17 +50,17 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label">Correo electrónico</label>
+        <label class="form-label">Correo electronico</label>
         <input class="form-input" type="email" id="email-input" placeholder="correo@ejemplo.com">
       </div>
       <div class="form-group">
-        <label class="form-label">Contraseña</label>
+        <label class="form-label">Contrasena</label>
         <input class="form-input" type="password" id="pass-input" placeholder="••••••••">
       </div>
 
       <button class="submit-btn" onclick="handleAuth()">Entrar</button>
       <div class="auth-switch" id="auth-switch-text">
-        ¿No tienes cuenta? <a onclick="toggleAuthMode()">Regístrate</a>
+        No tienes cuenta? <a onclick="toggleAuthMode()">Registrate</a>
       </div>
 
       <div id="jwt-preview" style="display:none">
@@ -71,18 +71,18 @@
   </div>
 </div>
 
-<!-- ═══════════════ VIEW: MENU ═══════════════ -->
+<!-- VIEW: MENU -->
 <div class="view" id="view-menu">
   <div class="hero">
     <h1>Pide lo que<br>te <em>antoje</em> hoy</h1>
-    <p>Comida rápida, sabor de verdad. Elige tu favorito y lo tendrás listo en minutos.</p>
+    <p>Comida rapida, sabor de verdad. Elige tu favorito y lo tendras listo en minutos.</p>
   </div>
 
   <div class="cats" id="cat-list"></div>
   <div class="products" id="product-list"></div>
 </div>
 
-<!-- ═══════════════ VIEW: ORDERS ═══════════════ -->
+<!-- VIEW: ORDERS -->
 <div class="view" id="view-orders">
   <div class="orders-container">
     <h2>Mis pedidos</h2>
@@ -90,7 +90,7 @@
   </div>
 </div>
 
-<!-- ═══════════════ VIEW: ADMIN ═══════════════ -->
+<!-- VIEW: ADMIN -->
 <div class="view" id="view-admin">
   <div class="admin-layout">
     <aside class="sidebar">
@@ -103,26 +103,25 @@
       </div>
       <div class="sidebar-label">Sistema</div>
       <div class="sidebar-item" onclick="adminTab('stats')" id="tab-stats">
-        <span class="sidebar-icon">📊</span> Estadísticas
+        <span class="sidebar-icon">📊</span> Estadisticas
       </div>
     </aside>
 
     <main class="admin-main">
       <!-- STATS -->
       <div id="admin-stats" style="display:none">
-        <h2>Estadísticas</h2>
+        <h2>Estadisticas</h2>
         <div class="stats-row">
-          <div class="stat-card"><div class="stat-label">Pedidos hoy</div><div class="stat-val orange">24</div></div>
-          <div class="stat-card"><div class="stat-label">Ingresos hoy</div><div class="stat-val green">$1,840</div></div>
-          <div class="stat-card"><div class="stat-label">En proceso</div><div class="stat-val blue">6</div></div>
-          <div class="stat-card"><div class="stat-label">Pendientes</div><div class="stat-val amber">3</div></div>
+          <div class="stat-card"><div class="stat-label">Pedidos hoy</div><div class="stat-val orange" id="stat-orders">0</div></div>
+          <div class="stat-card"><div class="stat-label">Ingresos hoy</div><div class="stat-val green" id="stat-revenue">$0</div></div>
+          <div class="stat-card"><div class="stat-label">En proceso</div><div class="stat-val blue" id="stat-process">0</div></div>
+          <div class="stat-card"><div class="stat-label">Pendientes</div><div class="stat-val amber" id="stat-pending">0</div></div>
         </div>
-        <div class="table-wrap"><div style="padding:60px;text-align:center;color:var(--muted)">📈 Gráficos de ventas aquí (Chart.js)</div></div>
       </div>
 
-      <!-- PRODUCTSS ADMIN -->
+      <!-- PRODUCTS ADMIN -->
       <div id="admin-products">
-        <h2>Gestión de Productos</h2>
+        <h2>Gestion de Productos</h2>
         <div class="table-wrap">
           <div class="table-header">
             <h3>Todos los productos</h3>
@@ -131,7 +130,7 @@
           <table>
             <thead>
               <tr>
-                <th>Producto</th><th>Categoría</th><th>Precio</th><th>Disponible</th><th>Acciones</th>
+                <th>Producto</th><th>Categoria</th><th>Precio</th><th>Disponible</th><th>Acciones</th>
               </tr>
             </thead>
             <tbody id="admin-product-table"></tbody>
@@ -139,13 +138,13 @@
         </div>
       </div>
 
-      <!-- ORDEnes ADMIN -->
+      <!-- ORDERS ADMIN -->
       <div id="admin-orders" style="display:none">
-        <h2>Gestión de Pedidos</h2>
+        <h2>Gestion de Pedidos</h2>
         <div class="admin-orders-table">
           <table>
             <thead>
-              <tr><th>Pedido</th><th>Cliente</th><th>Items</th><th>Total</th><th>Estado</th><th>Acción</th></tr>
+              <tr><th>Pedido</th><th>Cliente</th><th>Items</th><th>Total</th><th>Estado</th><th>Accion</th></tr>
             </thead>
             <tbody id="admin-orders-table"></tbody>
           </table>
@@ -155,28 +154,28 @@
   </div>
 </div>
 
-<!-- ═══════════════ Carrito PANEL ═══════════════ -->
+<!-- CART PANEL -->
 <div class="cart-panel" id="cart-panel">
   <div class="cart-header">
     <h2>Tu carrito</h2>
     <button class="close-btn" onclick="toggleCart()">✕</button>
   </div>
   <div class="cart-items" id="cart-items">
-    <div class="empty-cart"><span>🛒</span><p>Tu carrito está vacío</p></div>
+    <div class="empty-cart"><span>🛒</span><p>Tu carrito esta vacio</p></div>
   </div>
   <div class="cart-footer" id="cart-footer" style="display:none">
     <div class="cart-total">
       <span>Total</span>
       <strong id="cart-total">$0.00</strong>
     </div>
-    <button class="checkout-btn" onclick="checkout()">Confirmar pedido →</button>
+    <button class="checkout-btn" onclick="checkout()">Confirmar pedido</button>
   </div>
 </div>
 
-<!-- ═══════════════ pago MODAL ═══════════════ -->
+<!-- PAYMENT MODAL -->
 <div class="modal-bg" id="pay-modal">
   <div class="modal">
-    <h3>💳 Método de pago</h3>
+    <h3>Metodo de pago</h3>
     <div class="method-grid">
       <div class="method-card selected" onclick="selectMethod(this)">
         <span>💵</span><p>Efectivo</p>
@@ -196,124 +195,170 @@
   </div>
 </div>
 
-<!-- ═══════════════ TOAST ═══════════════ -->
+<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <script>
-// ── DATA ──
-const PRODUCTS = [
-  { id:1, name:'Classic Burger', emoji:'🍔', cat:'Hamburguesas', price:8.99, desc:'Res angus, lechuga, tomate y queso cheddar', avail:true },
-  { id:2, name:'BBQ Doble', emoji:'🍔', cat:'Hamburguesas', price:11.99, desc:'Doble carne, tocino crujiente, salsa BBQ', avail:true },
-  { id:3, name:'Crispy Chicken', emoji:'🍗', cat:'Pollo', price:9.50, desc:'Pechuga empanizada, coleslaw y pepinillos', avail:true },
-  { id:4, name:'Hot Wings x6', emoji:'🍗', cat:'Pollo', price:7.50, desc:'Alitas picantes con dip de queso azul', avail:true },
-  { id:5, name:'Pizza Margherita', emoji:'🍕', cat:'Pizzas', price:12.00, desc:'Tomate, mozzarella fresca y albahaca', avail:true },
-  { id:6, name:'Pepperoni Love', emoji:'🍕', cat:'Pizzas', price:13.50, desc:'Doble pepperoni, queso manchego', avail:false },
-  { id:7, name:'Papas Fritas L', emoji:'🍟', cat:'Acompañantes', price:3.99, desc:'Crujientes, con sal marina y especias', avail:true },
-  { id:8, name:'Tacos x3', emoji:'🌮', cat:'Mexicana', price:8.00, desc:'Carne asada, guacamole y pico de gallo', avail:true },
-  { id:9, name:'Sundae de Vainilla', emoji:'🍦', cat:'Postres', price:4.50, desc:'Helado suave con caramelo y nueces', avail:true },
-  { id:10, name:'Refresco Grande', emoji:'🥤', cat:'Bebidas', price:2.50, desc:'Elige tu sabor favorito, con hielo', avail:true },
-];
+// ── CONFIG ──
+const API = '';
 
-const SAMPLE_ORDERS = [
-  { id:'#ORD-001', date:'Hoy 12:34', items:['Classic Burger x1','Papas Fritas L x1'], total:12.98, status:'delivered', client:'Ana García' },
-  { id:'#ORD-002', date:'Hoy 13:10', items:['Hot Wings x6 x2','Refresco Grande x2'], total:20.00, status:'process', client:'Carlos López' },
-  { id:'#ORD-003', date:'Hoy 13:45', items:['Pizza Margherita x1','Sundae de Vainilla x2'], total:21.00, status:'pending', client:'María Torres' },
-  { id:'#ORD-004', date:'Hoy 14:02', items:['BBQ Doble x2','Papas Fritas L x2'], total:31.96, status:'pending', client:'Luis Rodríguez' },
-];
-
+let authToken = localStorage.getItem('qb_token') || null;
+let currentUser = JSON.parse(localStorage.getItem('qb_user') || 'null');
+let products = [];
 let cart = [];
-let currentUser = null;
 let isLogin = true;
 let activeCategory = 'Todos';
 
+// ── API HELPER ──
+async function api(path, options = {}) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (authToken) headers['Authorization'] = 'Bearer ' + authToken;
+  const res = await fetch(API + path, { ...options, headers });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Error del servidor');
+  return data;
+}
+
+// ── AUTO-LOGIN si hay token guardado ──
+if (currentUser && authToken) {
+  document.getElementById('nav-global').style.display = 'block';
+  if (currentUser.role === 'admin') document.getElementById('admin-link').style.display = '';
+  goTo(currentUser.role === 'admin' ? 'admin' : 'menu');
+}
+
 // ── AUTH ──
-function handleAuth() {
-  const email = document.getElementById('email-input').value || 'usuario@demo.com';
-  const role = isLogin ? (email.includes('admin') ? 'admin' : 'cliente')
-    : document.getElementById('role-select').value;
-  currentUser = { email, role, name: email.split('@')[0] };
-  const fakeJWT = 'eyJhbGciOiJIUzI1NiJ9.' + btoa(JSON.stringify({sub:email,role,exp:9999999999})) + '.SIG_DEMO';
-  document.getElementById('jwt-token-display').textContent = fakeJWT;
-  document.getElementById('jwt-preview').style.display = 'block';
-  setTimeout(() => {
-    document.getElementById('nav-global').style.display = 'block';
-    if (role === 'admin') document.getElementById('admin-link').style.display = '';
-    goTo(role === 'admin' ? 'admin' : 'menu');
-    showToast(`¡Bienvenido, ${currentUser.name}! Rol: ${role}`);
-  }, 900);
+async function handleAuth() {
+  const email = document.getElementById('email-input').value;
+  const password = document.getElementById('pass-input').value;
+
+  if (!email || !password) { showToast('Completa todos los campos'); return; }
+
+  const btn = document.querySelector('.submit-btn');
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Cargando...';
+  btn.style.opacity = '0.7';
+
+  try {
+    let data;
+    if (isLogin) {
+      data = await api('/api/auth/login', {
+        method: 'POST', body: JSON.stringify({ email, password })
+      });
+    } else {
+      const name = document.getElementById('name-input').value;
+      const role = document.getElementById('role-select').value;
+      if (!name) { showToast('Ingresa tu nombre'); btn.disabled = false; btn.textContent = originalText; btn.style.opacity = '1'; return; }
+      data = await api('/api/auth/register', {
+        method: 'POST', body: JSON.stringify({ name, email, password, role })
+      });
+    }
+
+    authToken = data.token;
+    currentUser = data.user;
+    localStorage.setItem('qb_token', authToken);
+    localStorage.setItem('qb_user', JSON.stringify(currentUser));
+
+    document.getElementById('jwt-token-display').textContent = authToken;
+    document.getElementById('jwt-preview').style.display = 'block';
+
+    setTimeout(() => {
+      document.getElementById('nav-global').style.display = 'block';
+      if (currentUser.role === 'admin') document.getElementById('admin-link').style.display = '';
+      goTo(currentUser.role === 'admin' ? 'admin' : 'menu');
+      showToast('Bienvenido, ' + currentUser.name + '! Rol: ' + currentUser.role);
+      btn.disabled = false; btn.textContent = originalText; btn.style.opacity = '1';
+    }, 900);
+  } catch (err) {
+    showToast('Error: ' + err.message);
+    btn.disabled = false;
+    btn.textContent = originalText;
+    btn.style.opacity = '1';
+  }
 }
 
 function toggleAuthMode() {
   isLogin = !isLogin;
-  document.getElementById('auth-title').textContent = isLogin ? 'Iniciar sesión' : 'Crear cuenta';
+  document.getElementById('auth-title').textContent = isLogin ? 'Iniciar sesion' : 'Crear cuenta';
   document.getElementById('auth-sub').textContent = isLogin
     ? 'Bienvenido de nuevo. Ingresa tus credenciales.'
     : 'Completa los datos para registrarte.';
   document.getElementById('register-only').style.display = isLogin ? 'none' : 'block';
   document.getElementById('auth-switch-text').innerHTML = isLogin
-    ? '¿No tienes cuenta? <a onclick="toggleAuthMode()">Regístrate</a>'
-    : '¿Ya tienes cuenta? <a onclick="toggleAuthMode()">Inicia sesión</a>';
+    ? 'No tienes cuenta? <a onclick="toggleAuthMode()">Registrate</a>'
+    : 'Ya tienes cuenta? <a onclick="toggleAuthMode()">Inicia sesion</a>';
   document.getElementById('jwt-preview').style.display = 'none';
 }
 
 function logout() {
-  currentUser = null; cart = [];
+  currentUser = null; authToken = null; cart = []; products = [];
+  localStorage.removeItem('qb_token');
+  localStorage.removeItem('qb_user');
   document.getElementById('nav-global').style.display = 'none';
+  document.getElementById('admin-link').style.display = 'none';
   document.getElementById('jwt-preview').style.display = 'none';
   updateCartBadge();
   goTo('auth');
 }
 
-// ── Navegación ──
+// ── NAVIGATION ──
 function goTo(view) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById('view-' + view).classList.add('active');
   if (view === 'menu') renderMenu();
   if (view === 'orders') renderOrders();
-  if (view === 'admin') { renderAdminProducts(); renderAdminOrders(); }
+  if (view === 'admin') { renderAdminProducts(); renderAdminOrders(); renderStats(); }
 }
 
 // ── MENU ──
-function renderMenu() {
-  const cats = ['Todos', ...new Set(PRODUCTS.map(p => p.cat))];
-  const catList = document.getElementById('cat-list');
-  catList.innerHTML = cats.map(c =>
-    `<div class="cat-pill ${c===activeCategory?'active':''}" onclick="filterCat('${c}')">${c}</div>`
+async function renderMenu() {
+  try {
+    const data = await api('/api/products');
+    products = data.products;
+  } catch (err) {
+    showToast('Error cargando menu');
+    return;
+  }
+
+  const cats = ['Todos', ...new Set(products.map(p => p.category))];
+  document.getElementById('cat-list').innerHTML = cats.map(c =>
+    '<div class="cat-pill ' + (c === activeCategory ? 'active' : '') + '" onclick="filterCat(\'' + c + '\')">' + c + '</div>'
   ).join('');
 
-  const filtered = activeCategory === 'Todos' ? PRODUCTS : PRODUCTS.filter(p => p.cat === activeCategory);
-  document.getElementById('product-list').innerHTML = filtered.map((p,i) => `
-    <div class="product-card ${p.avail?'':'unavailable'}" style="animation-delay:${i*40}ms">
-      <div class="product-img">${p.emoji}</div>
-      <div class="product-info">
-        <div class="product-cat">${p.cat}</div>
-        <div class="product-name">${p.name}</div>
-        <div class="product-desc">${p.desc}</div>
-        <div class="product-footer">
-          <div class="product-price">$${p.price.toFixed(2)}</div>
-          ${p.avail
-            ? `<button class="add-btn" onclick="addToCart(${p.id})">+</button>`
-            : `<span class="unavail-badge">No disponible</span>`}
-        </div>
-      </div>
-    </div>`).join('');
+  const filtered = activeCategory === 'Todos' ? products : products.filter(p => p.category === activeCategory);
+  document.getElementById('product-list').innerHTML = filtered.map((p, i) =>
+    '<div class="product-card ' + (p.available ? '' : 'unavailable') + '" style="animation-delay:' + (i * 40) + 'ms">' +
+      '<div class="product-img">' + (p.emoji || '🍽️') + '</div>' +
+      '<div class="product-info">' +
+        '<div class="product-cat">' + p.category + '</div>' +
+        '<div class="product-name">' + p.name + '</div>' +
+        '<div class="product-desc">' + (p.description || '') + '</div>' +
+        '<div class="product-footer">' +
+          '<div class="product-price">$' + Number(p.price).toFixed(2) + '</div>' +
+          (p.available
+            ? '<button class="add-btn" onclick="addToCart(' + p.id + ')">+</button>'
+            : '<span class="unavail-badge">No disponible</span>') +
+        '</div>' +
+      '</div>' +
+    '</div>'
+  ).join('');
 }
 
 function filterCat(cat) { activeCategory = cat; renderMenu(); }
 
-// ── Carrito ──
+// ── CART ──
 function addToCart(id) {
-  const p = PRODUCTS.find(x => x.id === id);
+  const p = products.find(x => x.id === id);
+  if (!p) return;
   const existing = cart.find(x => x.id === id);
   if (existing) existing.qty++;
   else cart.push({ ...p, qty: 1 });
   updateCartBadge();
-  showToast(`${p.emoji} ${p.name} agregado`);
+  showToast((p.emoji || '') + ' ' + p.name + ' agregado');
 }
 
 function updateCartBadge() {
-  const total = cart.reduce((s,i) => s + i.qty, 0);
-  document.getElementById('cart-count').textContent = total;
+  document.getElementById('cart-count').textContent = cart.reduce((s, i) => s + i.qty, 0);
 }
 
 function toggleCart() {
@@ -325,23 +370,24 @@ function renderCart() {
   const el = document.getElementById('cart-items');
   const footer = document.getElementById('cart-footer');
   if (!cart.length) {
-    el.innerHTML = '<div class="empty-cart"><span>🛒</span><p>Tu carrito está vacío</p></div>';
+    el.innerHTML = '<div class="empty-cart"><span>🛒</span><p>Tu carrito esta vacio</p></div>';
     footer.style.display = 'none'; return;
   }
-  el.innerHTML = cart.map(item => `
-    <div class="cart-item">
-      <div class="cart-item-emoji">${item.emoji}</div>
-      <div class="cart-item-info">
-        <div class="cart-item-name">${item.name}</div>
-        <div class="cart-item-price">$${(item.price * item.qty).toFixed(2)}</div>
-      </div>
-      <div class="qty-ctrl">
-        <button class="qty-btn" onclick="changeQty(${item.id},-1)">−</button>
-        <span class="qty-num">${item.qty}</span>
-        <button class="qty-btn" onclick="changeQty(${item.id},1)">+</button>
-      </div>
-    </div>`).join('');
-  const total = cart.reduce((s,i) => s + i.price * i.qty, 0);
+  el.innerHTML = cart.map(item =>
+    '<div class="cart-item">' +
+      '<div class="cart-item-emoji">' + (item.emoji || '🍽️') + '</div>' +
+      '<div class="cart-item-info">' +
+        '<div class="cart-item-name">' + item.name + '</div>' +
+        '<div class="cart-item-price">$' + (item.price * item.qty).toFixed(2) + '</div>' +
+      '</div>' +
+      '<div class="qty-ctrl">' +
+        '<button class="qty-btn" onclick="changeQty(' + item.id + ',-1)">-</button>' +
+        '<span class="qty-num">' + item.qty + '</span>' +
+        '<button class="qty-btn" onclick="changeQty(' + item.id + ',1)">+</button>' +
+      '</div>' +
+    '</div>'
+  ).join('');
+  const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
   document.getElementById('cart-total').textContent = '$' + total.toFixed(2);
   footer.style.display = 'block';
 }
@@ -365,104 +411,174 @@ function selectMethod(el) {
   el.classList.add('selected');
 }
 
-function confirmPayment() {
-  const newOrder = {
-    id: '#ORD-00' + (SAMPLE_ORDERS.length + 1),
-    date: 'Ahora mismo',
-    items: cart.map(i => `${i.name} x${i.qty}`),
-    total: cart.reduce((s,i) => s + i.price*i.qty, 0),
-    status: 'pending',
-    client: currentUser?.name || 'Cliente'
-  };
-  SAMPLE_ORDERS.unshift(newOrder);
-  cart = []; updateCartBadge();
-  closeModal();
-  document.getElementById('cart-panel').classList.remove('open');
-  showToast('✅ Pedido confirmado y pago registrado');
-  setTimeout(() => goTo('orders'), 600);
+async function confirmPayment() {
+  const methodEl = document.querySelector('.method-card.selected p');
+  if (!methodEl) { showToast('Selecciona un metodo de pago'); return; }
+  const method = methodEl.textContent.toLowerCase();
+
+  try {
+    // Crear orden
+    const items = cart.map(i => ({
+      productId: i.id,
+      name: i.name,
+      qty: i.qty,
+      price: Number(i.price)
+    }));
+    const orderData = await api('/api/orders', {
+      method: 'POST', body: JSON.stringify({ items })
+    });
+
+    // Crear pago
+    await api('/api/payments', {
+      method: 'POST',
+      body: JSON.stringify({
+        orderId: orderData.order.order_id,
+        amount: orderData.order.total,
+        method: method
+      })
+    });
+
+    cart = [];
+    updateCartBadge();
+    closeModal();
+    document.getElementById('cart-panel').classList.remove('open');
+    showToast('Pedido confirmado y pago registrado');
+    setTimeout(() => goTo('orders'), 600);
+  } catch (err) {
+    showToast('Error: ' + err.message);
+  }
 }
 
 function closeModal() { document.getElementById('pay-modal').classList.remove('open'); }
 
-// ── Ordenes ──
-function renderOrders() {
+// ── ORDERS ──
+async function renderOrders() {
   const el = document.getElementById('orders-list');
-  const userOrders = currentUser?.role === 'admin' ? SAMPLE_ORDERS
-    : SAMPLE_ORDERS.filter(o => o.client === (currentUser?.name || '') || true).slice(0,4);
-  const statusMap = { pending:'Pendiente', process:'En proceso', delivered:'Entregado' };
-  const statusClass = { pending:'status-pending', process:'status-process', delivered:'status-delivered' };
-  el.innerHTML = userOrders.map(o => `
-    <div class="order-card">
-      <div class="order-header">
-        <div>
-          <div class="order-id">${o.id}</div>
-          <div class="order-date">${o.date}</div>
-        </div>
-        <span class="status-badge ${statusClass[o.status]}">${statusMap[o.status]}</span>
-      </div>
-      <div class="order-items">${o.items.join(' · ')}</div>
-      <div class="order-footer">
-        <div>
-          <div class="order-total-label">Total del pedido</div>
-          <div class="order-total-val">$${o.total.toFixed(2)}</div>
-        </div>
-        ${o.status === 'pending'
-          ? `<button class="pay-btn" onclick="showToast('Procesando pago...')">Pagar ahora</button>`
-          : `<span style="font-size:13px;color:var(--muted)">Cliente: ${o.client}</span>`}
-      </div>
-    </div>`).join('');
+  try {
+    const data = await api('/api/orders');
+    const orders = data.orders;
+    const statusMap = { pending: 'Pendiente', process: 'En proceso', delivered: 'Entregado' };
+    const statusClass = { pending: 'status-pending', process: 'status-process', delivered: 'status-delivered' };
+
+    if (!orders.length) {
+      el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)">No tienes pedidos aun</div>';
+      return;
+    }
+
+    el.innerHTML = orders.map(o =>
+      '<div class="order-card">' +
+        '<div class="order-header">' +
+          '<div>' +
+            '<div class="order-id">#' + o.order_id + '</div>' +
+            '<div class="order-date">' + new Date(o.created_at).toLocaleString('es') + '</div>' +
+          '</div>' +
+          '<span class="status-badge ' + statusClass[o.status] + '">' + statusMap[o.status] + '</span>' +
+        '</div>' +
+        '<div class="order-items">' + (o.items || []).map(i => i.name + ' x' + i.qty).join(' · ') + '</div>' +
+        '<div class="order-footer">' +
+          '<div>' +
+            '<div class="order-total-label">Total del pedido</div>' +
+            '<div class="order-total-val">$' + Number(o.total).toFixed(2) + '</div>' +
+          '</div>' +
+          '<span style="font-size:13px;color:var(--muted)">Cliente: ' + o.client_name + '</span>' +
+        '</div>' +
+      '</div>'
+    ).join('');
+  } catch (err) {
+    el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)">Error cargando pedidos</div>';
+  }
 }
 
-// ── Panel administrador ──
+// ── ADMIN ──
 function adminTab(tab) {
-  ['products','orders','stats'].forEach(t => {
-    document.getElementById('admin-'+t).style.display = t===tab ? 'block' : 'none';
-    document.getElementById('tab-'+t)?.classList.toggle('active', t===tab);
+  ['products', 'orders', 'stats'].forEach(t => {
+    document.getElementById('admin-' + t).style.display = t === tab ? 'block' : 'none';
+    const tabEl = document.getElementById('tab-' + t);
+    if (tabEl) tabEl.classList.toggle('active', t === tab);
   });
+  if (tab === 'stats') renderStats();
 }
 
-function renderAdminProducts() {
-  const tbody = document.getElementById('admin-product-table');
-  tbody.innerHTML = PRODUCTS.map(p => `
-    <tr>
-      <td>${p.emoji} ${p.name}</td>
-      <td style="color:var(--muted2)">${p.cat}</td>
-      <td style="color:var(--accent);font-weight:600">$${p.price.toFixed(2)}</td>
-      <td>
-        <span class="avail-dot ${p.avail?'dot-on':'dot-off'}"></span>
-        ${p.avail?'Sí':'No'}
-      </td>
-      <td>
-        <button class="action-btn" onclick="showToast('Editar ${p.name}')">Editar</button>
-        <button class="action-btn danger" onclick="showToast('Eliminar ${p.name}')">Eliminar</button>
-      </td>
-    </tr>`).join('');
+async function renderAdminProducts() {
+  try {
+    const data = await api('/api/products');
+    const prods = data.products;
+    document.getElementById('admin-product-table').innerHTML = prods.map(p =>
+      '<tr>' +
+        '<td>' + (p.emoji || '') + ' ' + p.name + '</td>' +
+        '<td style="color:var(--muted2)">' + p.category + '</td>' +
+        '<td style="color:var(--accent);font-weight:600">$' + Number(p.price).toFixed(2) + '</td>' +
+        '<td><span class="avail-dot ' + (p.available ? 'dot-on' : 'dot-off') + '"></span>' + (p.available ? 'Si' : 'No') + '</td>' +
+        '<td>' +
+          '<button class="action-btn" onclick="showToast(\'Editar ' + p.name + '\')">Editar</button>' +
+          '<button class="action-btn danger" onclick="deleteProduct(' + p.id + ')">Eliminar</button>' +
+        '</td>' +
+      '</tr>'
+    ).join('');
+  } catch (err) {
+    showToast('Error cargando productos');
+  }
 }
 
-function renderAdminOrders() {
-  const statusMap = { pending:'Pendiente', process:'En proceso', delivered:'Entregado' };
-  const statusClass = { pending:'status-pending', process:'status-process', delivered:'status-delivered' };
-  const next = { pending:'process', process:'delivered', delivered:'delivered' };
-  const nextLabel = { pending:'→ En proceso', process:'→ Entregado', delivered:'✓ Listo' };
-  document.getElementById('admin-orders-table').innerHTML = SAMPLE_ORDERS.map(o => `
-    <tr>
-      <td style="font-weight:600">${o.id}</td>
-      <td style="color:var(--muted2)">${o.client}</td>
-      <td style="color:var(--muted2);font-size:12px">${o.items.join(', ')}</td>
-      <td style="color:var(--accent);font-weight:600">$${o.total.toFixed(2)}</td>
-      <td><span class="status-badge ${statusClass[o.status]}">${statusMap[o.status]}</span></td>
-      <td>
-        ${o.status !== 'delivered'
-          ? `<button class="action-btn" onclick="advanceOrder('${o.id}')">${nextLabel[o.status]}</button>`
-          : '<span style="color:var(--muted);font-size:12px">Completado</span>'}
-      </td>
-    </tr>`).join('');
+async function deleteProduct(id) {
+  try {
+    await api('/api/products/' + id, { method: 'DELETE' });
+    showToast('Producto eliminado');
+    renderAdminProducts();
+  } catch (err) {
+    showToast('Error: ' + err.message);
+  }
 }
 
-function advanceOrder(id) {
-  const next = { pending:'process', process:'delivered' };
-  const o = SAMPLE_ORDERS.find(x => x.id === id);
-  if (o && next[o.status]) { o.status = next[o.status]; renderAdminOrders(); showToast(`Pedido ${id} actualizado`); }
+async function renderAdminOrders() {
+  try {
+    const data = await api('/api/orders');
+    const orders = data.orders;
+    const statusMap = { pending: 'Pendiente', process: 'En proceso', delivered: 'Entregado' };
+    const statusClass = { pending: 'status-pending', process: 'status-process', delivered: 'status-delivered' };
+    const nextLabel = { pending: 'En proceso', process: 'Entregado' };
+    const nextStatus = { pending: 'process', process: 'delivered' };
+
+    document.getElementById('admin-orders-table').innerHTML = orders.map(o =>
+      '<tr>' +
+        '<td style="font-weight:600">' + o.order_id + '</td>' +
+        '<td style="color:var(--muted2)">' + o.client_name + '</td>' +
+        '<td style="color:var(--muted2);font-size:12px">' + (o.items || []).map(i => i.name + ' x' + i.qty).join(', ') + '</td>' +
+        '<td style="color:var(--accent);font-weight:600">$' + Number(o.total).toFixed(2) + '</td>' +
+        '<td><span class="status-badge ' + statusClass[o.status] + '">' + statusMap[o.status] + '</span></td>' +
+        '<td>' +
+          (o.status !== 'delivered'
+            ? '<button class="action-btn" onclick="advanceOrder(\'' + o.order_id + '\', \'' + nextStatus[o.status] + '\')">' + nextLabel[o.status] + '</button>'
+            : '<span style="color:var(--muted);font-size:12px">Completado</span>') +
+        '</td>' +
+      '</tr>'
+    ).join('');
+  } catch (err) {
+    showToast('Error cargando pedidos admin');
+  }
+}
+
+async function advanceOrder(orderId, newStatus) {
+  try {
+    await api('/api/orders/' + orderId + '/status', {
+      method: 'PATCH', body: JSON.stringify({ status: newStatus })
+    });
+    showToast('Pedido ' + orderId + ' actualizado');
+    renderAdminOrders();
+  } catch (err) {
+    showToast('Error: ' + err.message);
+  }
+}
+
+async function renderStats() {
+  try {
+    const data = await api('/api/orders');
+    const orders = data.orders;
+    document.getElementById('stat-orders').textContent = orders.length;
+    document.getElementById('stat-revenue').textContent = '$' + orders.reduce((s, o) => s + Number(o.total), 0).toFixed(2);
+    document.getElementById('stat-process').textContent = orders.filter(o => o.status === 'process').length;
+    document.getElementById('stat-pending').textContent = orders.filter(o => o.status === 'pending').length;
+  } catch (err) { /* silent */ }
 }
 
 // ── TOAST ──

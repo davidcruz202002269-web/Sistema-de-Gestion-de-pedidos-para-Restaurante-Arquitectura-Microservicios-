@@ -1,8 +1,8 @@
 {
-  "name": "quickbite-payments-service",
+  "name": "quickbite-api-gateway",
   "version": "1.0.0",
   "type": "module",
-  "description": "QuickBite — Servicio de pagos",
+  "description": "QuickBite — API Gateway (punto de entrada unico)",
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
@@ -10,10 +10,10 @@
   },
   "dependencies": {
     "express": "^4.18.2",
-    "jsonwebtoken": "^9.0.2",
+    "http-proxy-middleware": "^3.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
-    "pg": "^8.13.0"
+    "morgan": "^1.10.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.2"

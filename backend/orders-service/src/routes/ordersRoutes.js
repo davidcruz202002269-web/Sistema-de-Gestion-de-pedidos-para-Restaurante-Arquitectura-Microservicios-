@@ -1,13 +1,12 @@
 import { Router } from 'express';
+import ordersController from '../controllers/ordersController.js';
+import auth from '../middlewares/verifyToken.js';
+
 const router = Router();
 
-import { create, getAll, getById, updateStatus } from '../controllers/ordersController.jsverifyToken.js';
-import { verifyToken, requireAdmin } from '../middlewares/verifyToken.js';
-
-// Todas las rutas requieren autenticación
-router.post('/', verifyToken, create);
-router.get('/', verifyToken, getAll);
-router.get('/:id', verifyToken, getById);
-router.patch('/:id/status', verifyToken, requireAdmin, updateStatus);
+router.post('/', auth.verifyToken, ordersController.create);
+router.get('/', auth.verifyToken, ordersController.getAll);
+router.get('/:id', auth.verifyToken, ordersController.getById);
+router.patch('/:id/status', auth.verifyToken, auth.requireAdmin, ordersController.updateStatus);
 
 export default router;

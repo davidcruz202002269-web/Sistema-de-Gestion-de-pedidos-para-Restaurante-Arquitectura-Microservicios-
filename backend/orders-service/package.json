@@ -1,6 +1,7 @@
 {
   "name": "quickbite-orders-service",
   "version": "1.0.0",
+  "type": "module",
   "description": "QuickBite — Servicio de pedidos",
   "main": "src/index.js",
   "scripts": {
@@ -12,7 +13,7 @@
     "jsonwebtoken": "^9.0.2",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
-    "node-fetch": "^2.7.0"
+    "pg": "^8.13.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.2"

@@ -1,66 +1,105 @@
-// Base de datos en memoria — en producción usar MongoDB/PostgreSQL
-let products = [
-  { id: 1, name: 'Classic Burger', emoji: '🍔', category: 'Hamburguesas', price: 8.99, description: 'Res angus, lechuga, tomate y queso cheddar', available: true },
-  { id: 2, name: 'BBQ Doble', emoji: '🍔', category: 'Hamburguesas', price: 11.99, description: 'Doble carne, tocino crujiente, salsa BBQ', available: true },
-  { id: 3, name: 'Crispy Chicken', emoji: '🍗', category: 'Pollo', price: 9.50, description: 'Pechuga empanizada, coleslaw y pepinillos', available: true },
-  { id: 4, name: 'Hot Wings x6', emoji: '🍗', category: 'Pollo', price: 7.50, description: 'Alitas picantes con dip de queso azul', available: true },
-  { id: 5, name: 'Pizza Margherita', emoji: '🍕', category: 'Pizzas', price: 12.00, description: 'Tomate, mozzarella fresca y albahaca', available: true },
-  { id: 6, name: 'Pepperoni Love', emoji: '🍕', category: 'Pizzas', price: 13.50, description: 'Doble pepperoni, queso manchego', available: false },
-  { id: 7, name: 'Papas Fritas L', emoji: '🍟', category: 'Acompañantes', price: 3.99, description: 'Crujientes, con sal marina y especias', available: true },
-  { id: 8, name: 'Tacos x3', emoji: '🌮', category: 'Mexicana', price: 8.00, description: 'Carne asada, guacamole y pico de gallo', available: true },
-  { id: 9, name: 'Sundae de Vainilla', emoji: '🍦', category: 'Postres', price: 4.50, description: 'Helado suave con caramelo y nueces', available: true },
-  { id: 10, name: 'Refresco Grande', emoji: '🥤', category: 'Bebidas', price: 2.50, description: 'Elige tu sabor favorito, con hielo', available: true },
-];
-let nextId = 11;
+import pool from '../config/db.js';
 
-// ── GET /api/products ─────────────────────────────────────────────────────────
-const getAll = (req, res) => {
-  const { category, available } = req.query;
-  let result = [...products];
+// ── GET /api/products
+const getAll = async (req, res) => {
+  try {
+    const { category, available } = req.query;
+    let query = 'SELECT * FROM products';
+    const params = [];
+    const conditions = [];
 
-  if (category) result = result.filter(p => p.category.toLowerCase() === category.toLowerCase());
-  if (available !== undefined) result = result.filter(p => p.available === (available === 'true'));
+    if (category) {
+      params.push(category);
+      conditions.push(`LOWER(category) = LOWER($${params.length})`);
+    }
+    if (available !== undefined) {
+      params.push(available === 'true');
+      conditions.push(`available = $${params.length}`);
+    }
 
-  return res.json({ total: result.length, products: result });
-};
+    if (conditions.length > 0) query += ' WHERE ' + conditions.join(' AND ');
+    query += ' ORDER BY id';
 
-// ── GET /api/products/:id ─────────────────────────────────────────────────────
-const getById = (req, res) => {
-  const product = products.find(p => p.id === Number(req.params.id));
-  if (!product) return res.status(404).json({ error: 'Producto no encontrado' });
-  return res.json({ product });
-};
-
-// ── POST /api/products ────────────────────────────────────────────────────────
-const create = (req, res) => {
-  const { name, emoji, category, price, description, available = true } = req.body;
-
-  if (!name || !category || price === undefined) {
-    return res.status(400).json({ error: 'name, category y price son requeridos' });
+    const result = await pool.query(query, params);
+    return res.json({ total: result.rows.length, products: result.rows });
+  } catch (err) {
+    console.error('[products] getAll error:', err.message);
+    return res.status(500).json({ error: 'Error interno del servidor' });
   }
-
-  const newProduct = { id: nextId++, name, emoji: emoji || '🍽️', category, price: Number(price), description: description || '', available };
-  products.push(newProduct);
-
-  return res.status(201).json({ message: 'Producto creado', product: newProduct });
 };
 
-// ── PUT /api/products/:id ─────────────────────────────────────────────────────
-const update = (req, res) => {
-  const idx = products.findIndex(p => p.id === Number(req.params.id));
-  if (idx === -1) return res.status(404).json({ error: 'Producto no encontrado' });
-
-  products[idx] = { ...products[idx], ...req.body, id: products[idx].id };
-  return res.json({ message: 'Producto actualizado', product: products[idx] });
+// ── GET /api/products/:id
+const getById = async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM products WHERE id = $1', [req.params.id]);
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Producto no encontrado' });
+    return res.json({ product: result.rows[0] });
+  } catch (err) {
+    console.error('[products] getById error:', err.message);
+    return res.status(500).json({ error: 'Error interno del servidor' });
+  }
 };
 
-// ── DELETE /api/products/:id ──────────────────────────────────────────────────
-const remove = (req, res) => {
-  const idx = products.findIndex(p => p.id === Number(req.params.id));
-  if (idx === -1) return res.status(404).json({ error: 'Producto no encontrado' });
+// ── POST /api/products
+const create = async (req, res) => {
+  try {
+    const { name, emoji, category, price, description, available = true } = req.body;
 
-  const [deleted] = products.splice(idx, 1);
-  return res.json({ message: 'Producto eliminado', product: deleted });
+    if (!name || !category || price === undefined) {
+      return res.status(400).json({ error: 'name, category y price son requeridos' });
+    }
+
+    const result = await pool.query(
+      'INSERT INTO products (name, emoji, category, price, description, available) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+      [name, emoji || '', category, Number(price), description || '', available]
+    );
+
+    return res.status(201).json({ message: 'Producto creado', product: result.rows[0] });
+  } catch (err) {
+    console.error('[products] create error:', err.message);
+    return res.status(500).json({ error: 'Error interno del servidor' });
+  }
+};
+
+// ── PUT /api/products/:id
+const update = async (req, res) => {
+  try {
+    const existing = await pool.query('SELECT * FROM products WHERE id = $1', [req.params.id]);
+    if (existing.rows.length === 0) return res.status(404).json({ error: 'Producto no encontrado' });
+
+    const current = existing.rows[0];
+    const { name, emoji, category, price, description, available } = req.body;
+
+    const result = await pool.query(
+      'UPDATE products SET name=$1, emoji=$2, category=$3, price=$4, description=$5, available=$6 WHERE id=$7 RETURNING *',
+      [
+        name ?? current.name,
+        emoji ?? current.emoji,
+        category ?? current.category,
+        price !== undefined ? Number(price) : current.price,
+        description ?? current.description,
+        available !== undefined ? available : current.available,
+        req.params.id,
+      ]
+    );
+
+    return res.json({ message: 'Producto actualizado', product: result.rows[0] });
+  } catch (err) {
+    console.error('[products] update error:', err.message);
+    return res.status(500).json({ error: 'Error interno del servidor' });
+  }
+};
+
+// ── DELETE /api/products/:id
+const remove = async (req, res) => {
+  try {
+    const result = await pool.query('DELETE FROM products WHERE id = $1 RETURNING *', [req.params.id]);
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Producto no encontrado' });
+    return res.json({ message: 'Producto eliminado', product: result.rows[0] });
+  } catch (err) {
+    console.error('[products] remove error:', err.message);
+    return res.status(500).json({ error: 'Error interno del servidor' });
+  }
 };
 
 export default { getAll, getById, create, update, remove };
